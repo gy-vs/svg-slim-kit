@@ -3,7 +3,11 @@ import { detachNodeFromParent, querySelector } from '../lib/xast.js';
 import { visit, visitSkip } from '../lib/util/visit.js';
 import { collectStylesheet, computeStyle } from '../lib/style.js';
 import { parsePathData } from '../lib/path.js';
-import { findReferences, hasScripts } from '../lib/svgo/tools.js';
+import {
+  findReferences,
+  createNamespaceTracker,
+  hasScripts,
+} from '../lib/svgo/tools.js';
 
 /**
  * @typedef RemoveHiddenElemsParams
@@ -95,6 +99,7 @@ export const fn = (root, params) => {
    * If styles are present, we can't be sure if a definition is unused or not
    */
   let deoptimized = false;
+  const namespaces = createNamespaceTracker();
 
   /**
    * Nodes can't be removed if they or any of their children have an id attribute that is referenced.
@@ -161,9 +166,11 @@ export const fn = (root, params) => {
   return {
     element: {
       enter: (node, parentNode) => {
+        namespaces.enter(node);
+
         if (
           (node.name === 'style' && node.children.length !== 0) ||
-          hasScripts(node)
+          hasScripts(node, namespaces)
         ) {
           deoptimized = true;
           return;
@@ -424,6 +431,9 @@ export const fn = (root, params) => {
             allReferences.add(id);
           }
         }
+      },
+      exit: () => {
+        namespaces.exit();
       },
     },
     root: {

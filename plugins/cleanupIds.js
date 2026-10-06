@@ -1,5 +1,9 @@
 import { visitSkip } from '../lib/util/visit.js';
-import { findReferences, hasScripts } from '../lib/svgo/tools.js';
+import {
+  createNamespaceTracker,
+  findReferences,
+  hasScripts,
+} from '../lib/svgo/tools.js';
 
 /**
  * @typedef CleanupIdsParams
@@ -150,15 +154,18 @@ export const fn = (_root, params) => {
   /** @type {Map<string, {element: import('../lib/types.js').XastElement, name: string }[]>} */
   const referencesById = new Map();
   let deoptimized = false;
+  const namespaces = createNamespaceTracker();
 
   return {
     element: {
       enter: (node) => {
+        namespaces.enter(node);
+
         if (!force) {
           // deoptimize if style or scripts are present
           if (
             (node.name === 'style' && node.children.length !== 0) ||
-            hasScripts(node)
+            hasScripts(node, namespaces)
           ) {
             deoptimized = true;
             return;
@@ -174,6 +181,9 @@ export const fn = (_root, params) => {
               }
             }
             if (hasDefsOnly) {
+              // keep the namespace tracker balanced, as the exit
+              // callback is not called for skipped nodes
+              namespaces.exit();
               return visitSkip;
             }
           }
@@ -200,6 +210,9 @@ export const fn = (_root, params) => {
             }
           }
         }
+      },
+      exit: () => {
+        namespaces.exit();
       },
     },
 

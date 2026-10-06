@@ -1,0 +1,19 @@
+Removes script elements bound to the SVG namespace through a prefix, but
+keeps elements named script in other namespaces.
+
+===
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:foo="http://example.com/foo" viewBox="0 0 100 100">
+  <svg:script>alert('uwu')</svg:script>
+  <foo:script>private data</foo:script>
+  <text y="10">uwu</text>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:foo="http://example.com/foo" viewBox="0 0 100 100">
+    <foo:script>
+        private data
+    </foo:script>
+    <text y="10">uwu</text>
+</svg>

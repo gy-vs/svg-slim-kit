@@ -1,7 +1,7 @@
 import { detachNodeFromParent } from '../lib/xast.js';
 import { visit, visitSkip } from '../lib/util/visit.js';
 import { collectStylesheet, computeStyle } from '../lib/style.js';
-import { hasScripts } from '../lib/svgo/tools.js';
+import { createNamespaceTracker, hasScripts } from '../lib/svgo/tools.js';
 import { elemsGroups } from './_collections.js';
 
 /**
@@ -30,12 +30,18 @@ export const fn = (root, params) => {
 
   // style and script elements deoptimize this plugin
   let hasStyleOrScript = false;
+  const namespaces = createNamespaceTracker();
   visit(root, {
     element: {
       enter: (node) => {
-        if (node.name === 'style' || hasScripts(node)) {
+        namespaces.enter(node);
+
+        if (node.name === 'style' || hasScripts(node, namespaces)) {
           hasStyleOrScript = true;
         }
+      },
+      exit: () => {
+        namespaces.exit();
       },
     },
   });

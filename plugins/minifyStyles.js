@@ -1,6 +1,6 @@
 import * as csso from 'csso';
 import { detachNodeFromParent } from '../lib/xast.js';
-import { hasScripts } from '../lib/svgo/tools.js';
+import { createNamespaceTracker, hasScripts } from '../lib/svgo/tools.js';
 
 /**
  * @typedef Usage
@@ -70,12 +70,15 @@ export const fn = (_root, { usage, ...params }) => {
   }
 
   let deoptimized = false;
+  const namespaces = createNamespaceTracker();
 
   return {
     element: {
       enter: (node, parentNode) => {
+        namespaces.enter(node);
+
         // detect deoptimizations
-        if (hasScripts(node)) {
+        if (hasScripts(node, namespaces)) {
           deoptimized = true;
         }
 
@@ -95,6 +98,9 @@ export const fn = (_root, { usage, ...params }) => {
         } else if (node.attributes.style != null) {
           elementsWithStyleAttributes.push(node);
         }
+      },
+      exit: () => {
+        namespaces.exit();
       },
     },
 
