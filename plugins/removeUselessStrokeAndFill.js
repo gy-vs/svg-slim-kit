@@ -29,11 +29,11 @@ export const fn = (root, params) => {
   } = params;
 
   // style and script elements deoptimize this plugin
-  let hasStyleOrScript = false;
+  let hasStyleOrScript = hasScripts(root);
   visit(root, {
     element: {
       enter: (node) => {
-        if (node.name === 'style' || hasScripts(node)) {
+        if (node.name === 'style') {
           hasStyleOrScript = true;
         }
       },

@@ -129,7 +129,7 @@ const getIdString = (arr) => {
  *
  * @type {import('../lib/types.js').Plugin<CleanupIdsParams>}
  */
-export const fn = (_root, params) => {
+export const fn = (root, params) => {
   const {
     remove = true,
     minify = true,
@@ -149,17 +149,15 @@ export const fn = (_root, params) => {
   const nodeById = new Map();
   /** @type {Map<string, {element: import('../lib/types.js').XastElement, name: string }[]>} */
   const referencesById = new Map();
-  let deoptimized = false;
+  // deoptimize if scripts are present
+  let deoptimized = !force && hasScripts(root);
 
   return {
     element: {
       enter: (node) => {
         if (!force) {
-          // deoptimize if style or scripts are present
-          if (
-            (node.name === 'style' && node.children.length !== 0) ||
-            hasScripts(node)
-          ) {
+          // deoptimize if style is present
+          if (node.name === 'style' && node.children.length !== 0) {
             deoptimized = true;
             return;
           }

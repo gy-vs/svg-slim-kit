@@ -1,5 +1,10 @@
 import { attrsGroups } from './_collections.js';
 import { detachNodeFromParent } from '../lib/xast.js';
+import {
+  createNamespaceResolver,
+  isJavaScriptUri,
+  isScriptElement,
+} from '../lib/svgo/tools.js';
 
 export const name = 'removeScripts';
 export const description = 'removes scripts';
@@ -22,10 +27,14 @@ const eventAttrs = [
  * @type {import('../lib/types.js').Plugin}
  */
 export const fn = () => {
+  const nsResolver = createNamespaceResolver();
+
   return {
     element: {
       enter: (node, parentNode) => {
-        if (node.name === 'script') {
+        nsResolver.enter(node);
+
+        if (isScriptElement(node, nsResolver.resolve)) {
           detachNodeFromParent(node, parentNode);
           return;
         }
@@ -37,16 +46,15 @@ export const fn = () => {
         }
       },
       exit: (node, parentNode) => {
+        nsResolver.exit();
+
         if (node.name !== 'a') {
           return;
         }
 
         for (const attr of Object.keys(node.attributes)) {
           if (attr === 'href' || attr.endsWith(':href')) {
-            if (
-              node.attributes[attr] == null ||
-              !node.attributes[attr].trimStart().startsWith('javascript:')
-            ) {
+            if (!isJavaScriptUri(node.attributes[attr])) {
               continue;
             }
 

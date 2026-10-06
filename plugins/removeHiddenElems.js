@@ -92,9 +92,10 @@ export const fn = (root, params) => {
   const referencesById = new Map();
 
   /**
-   * If styles are present, we can't be sure if a definition is unused or not
+   * If styles or scripts are present, we can't be sure if a definition is
+   * unused or not.
    */
-  let deoptimized = false;
+  let deoptimized = hasScripts(root);
 
   /**
    * Nodes can't be removed if they or any of their children have an id attribute that is referenced.
@@ -161,10 +162,7 @@ export const fn = (root, params) => {
   return {
     element: {
       enter: (node, parentNode) => {
-        if (
-          (node.name === 'style' && node.children.length !== 0) ||
-          hasScripts(node)
-        ) {
+        if (node.name === 'style' && node.children.length !== 0) {
           deoptimized = true;
           return;
         }

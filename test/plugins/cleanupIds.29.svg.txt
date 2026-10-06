@@ -1,0 +1,20 @@
+Removes unreferenced IDs when an element named script belongs to another
+namespace, which is not a script and does not deoptimize the plugin.
+
+===
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:foo="http://example.com/foo">
+    <foo:script>
+        private data
+    </foo:script>
+    <circle id="circle001" fill="red" cx="60" cy="60" r="50"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:foo="http://example.com/foo">
+    <foo:script>
+        private data
+    </foo:script>
+    <circle fill="red" cx="60" cy="60" r="50"/>
+</svg>

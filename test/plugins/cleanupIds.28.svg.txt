@@ -1,0 +1,20 @@
+Preserves IDs when a script element with a prefix bound to the SVG namespace
+is present.
+
+===
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+    <svg:script>
+        alert(1)
+    </svg:script>
+    <circle id="circle001" fill="red" cx="60" cy="60" r="50"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+    <svg:script>
+        alert(1)
+    </svg:script>
+    <circle id="circle001" fill="red" cx="60" cy="60" r="50"/>
+</svg>

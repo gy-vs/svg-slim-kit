@@ -1,0 +1,21 @@
+Collapses links to JavaScript URIs regardless of the capitalization of the
+scheme, including values with leading whitespace, since browsers parse the
+protocol case-insensitively.
+
+===
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100">
+  <a href="JavaScript:alert('uwu')">
+    <text y="10">uwu</text>
+  </a>
+  <a xlink:href=" JAVASCRIPT:alert('uwu')">
+    <text y="20">uwu</text>
+  </a>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100">
+    <text y="10">uwu</text>
+    <text y="20">uwu</text>
+</svg>

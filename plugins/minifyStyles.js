@@ -32,7 +32,7 @@ export const description = 'minifies styles and removes unused styles';
  * @author strarsis <strarsis@gmail.com>
  * @type {import('../lib/types.js').Plugin<MinifyStylesParams>}
  */
-export const fn = (_root, { usage, ...params }) => {
+export const fn = (root, { usage, ...params }) => {
   /** @type {Map<import('../lib/types.js').XastElement, import('../lib/types.js').XastParent>} */
   const styleElements = new Map();
 
@@ -69,16 +69,11 @@ export const fn = (_root, { usage, ...params }) => {
     forceUsageDeoptimized = usage.force == null ? false : usage.force;
   }
 
-  let deoptimized = false;
+  let deoptimized = hasScripts(root);
 
   return {
     element: {
       enter: (node, parentNode) => {
-        // detect deoptimizations
-        if (hasScripts(node)) {
-          deoptimized = true;
-        }
-
         // collect tags, ids and classes usage
         tagsUsage.add(node.name);
         if (node.attributes.id != null) {

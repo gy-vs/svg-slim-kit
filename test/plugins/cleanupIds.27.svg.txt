@@ -1,0 +1,16 @@
+Preserves IDs when a link to a JavaScript URI is present, regardless of the
+capitalization of the scheme.
+
+===
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <a xlink:href="JavaScript:alert('uwu')">uwu</a>
+    <circle id="circle001" fill="red" cx="60" cy="60" r="50"/>
+</svg>
+
+@@@
+
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <a xlink:href="JavaScript:alert('uwu')">uwu</a>
+    <circle id="circle001" fill="red" cx="60" cy="60" r="50"/>
+</svg>
